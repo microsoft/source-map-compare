@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "strict": true,
+    "removeComments": false,
+    "experimentalDecorators": true,
+    "noLib": false,
+    "jsx": "react",
+    "noImplicitReturns": true,
+    "noUnusedParameters": true,
+    "noUnusedLocals": true,
+    "forceConsistentCasingInFileNames": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "moduleResolution": "node",
+    "importHelpers": true,
+    "skipLibCheck": true,
+    "noErrorTruncation": true,
+    "esModuleInterop": true,
+    "outDir": "lib",
+    "target": "es2018",
+    "module": "commonjs",
+    "lib": ["dom", "ESNext"],
+    "sourceMap": true
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["node_modules", "dist", "lib"]
+}
