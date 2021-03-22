@@ -6,3 +6,4 @@ src
 .prettierrc
 yarn.lock
 tsconfig.json
+jest.config.js
