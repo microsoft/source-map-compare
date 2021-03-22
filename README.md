@@ -12,6 +12,8 @@ To install globally:
 npm i -g source-map-compare
 ```
 
+source-map-compare can also be run via npx.
+
 ## Basic usage
 
 To compare two bundles:
