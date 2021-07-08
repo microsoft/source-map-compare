@@ -1,0 +1,7 @@
+{
+  "type": "patch",
+  "comment": "Fix security violations",
+  "packageName": "source-map-compare",
+  "email": "mahowa@microsoft.com",
+  "dependentChangeType": "patch"
+}
