@@ -1,0 +1,20 @@
+{
+  "name": "source-map-compare",
+  "entries": [
+    {
+      "date": "Thu, 08 Jul 2021 18:13:45 GMT",
+      "tag": "source-map-compare_v0.1.1",
+      "version": "0.1.1",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Fix security violations",
+            "author": "mahowa@microsoft.com",
+            "commit": "398084ddfecd80ec535184ecb404a4e2ba445d66",
+            "package": "source-map-compare"
+          }
+        ]
+      }
+    }
+  ]
+}
