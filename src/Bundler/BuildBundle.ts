@@ -35,7 +35,7 @@ const externalLibs: ExternalLib[] = [
   },
   {
     packageName: '@fluentui/react',
-    packageSemver: '7',
+    packageSemver: '8',
     libraryVariable: 'FluentUIReact',
     scriptPath: '/dist/fluentui-react.min.js'
   }
