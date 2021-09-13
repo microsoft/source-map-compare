@@ -3,9 +3,6 @@ name: CI
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
 on:
-  push:
-    branches:
-      - main
   pull_request:
     branches:
       - main
@@ -21,6 +18,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          # needed to ensure checkchange works
+          fetch-depth: 0
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
