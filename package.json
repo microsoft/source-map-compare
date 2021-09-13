@@ -6,12 +6,15 @@
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "scripts": {
+    "beachball:publish": "beachball publish",
     "build": "tsc",
-    "test": "jest",
-    "start": "node ./lib/Bundler/source-map-compare",
+    "change": "beachball change",
+    "check": "beachball check",
+    "ci": "prettier -c src && yarn run lint && yarn build && yarn test --ci",
     "format": "prettier --write src",
     "lint": "eslint \"src/**/*.ts\" -f eslint-formatter-friendly",
-    "ci": "prettier -c src && yarn run lint && yarn build && yarn test --ci"
+    "start": "node ./lib/Bundler/source-map-compare",
+    "test": "jest"
   },
   "bin": {
     "source-map-compare": "./lib/Bundler/source-map-compare.js"
@@ -32,16 +35,17 @@
   },
   "devDependencies": {
     "@types/jest": "^26.0.14",
-    "@types/react-dom": "^16.9.0",
     "@types/react": "^16.14.3",
+    "@types/react-dom": "^16.9.0",
     "@types/rimraf": "^2.0.2",
     "@types/webpack": "^4.29.3",
     "@typescript-eslint/eslint-plugin": "^4.11.1",
     "@typescript-eslint/parser": "^4.11.1",
+    "beachball": "^2.12.1",
+    "eslint": "^7.16.0",
     "eslint-config-prettier": "^7.1.0",
     "eslint-formatter-friendly": "^7.0.0",
     "eslint-plugin-prettier": "^3.3.0",
-    "eslint": "^7.16.0",
     "jest": "^26.5.2",
     "prettier": "^2.2.1",
     "ts-jest": "^26.4.4",

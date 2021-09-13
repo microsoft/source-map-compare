@@ -54,6 +54,23 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
 contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
+### Development Workflow
+
+After cloning the repo, you can install and build with:
+
+```
+yarn
+yarn build
+```
+
+You may need to first install yarn with `npm install -g yarn`.
+
+This repo uses [Beachball](https://microsoft.github.io/beachball) for tracking package versions. Before you can complete a pull request, you must generate change files for your change by running:
+
+```
+yarn change
+```
+
 ## Trademarks
 
 This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft
