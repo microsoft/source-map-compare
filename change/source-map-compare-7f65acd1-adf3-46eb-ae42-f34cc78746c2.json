@@ -1,7 +1,0 @@
-{
-  "type": "patch",
-  "comment": "Add beachball integration",
-  "packageName": "source-map-compare",
-  "email": "mahowa@microsoft.com",
-  "dependentChangeType": "patch"
-}
