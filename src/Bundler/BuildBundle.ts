@@ -8,38 +8,11 @@ import { default as rimrafAsync } from 'rimraf';
 import { promisify } from 'util';
 import webpack from 'webpack';
 import { AppArguments } from '../AppArguments';
+import { externalLibs } from './Externals';
 import { InlineChunkHtmlPlugin } from './InlineChunkHtmlPlugin';
 import { CommonOptions } from './Options';
 
 const rimraf = promisify(rimrafAsync);
-
-interface ExternalLib {
-  packageName: string;
-  packageSemver: string;
-  libraryVariable: string;
-  scriptPath: string;
-}
-
-const externalLibs: ExternalLib[] = [
-  {
-    packageName: 'react',
-    packageSemver: '16',
-    libraryVariable: 'React',
-    scriptPath: '/umd/react.production.min.js'
-  },
-  {
-    packageName: 'react-dom',
-    packageSemver: '16',
-    libraryVariable: 'ReactDOM',
-    scriptPath: '/umd/react-dom.production.min.js'
-  },
-  {
-    packageName: '@fluentui/react',
-    packageSemver: '8',
-    libraryVariable: 'FluentUIReact',
-    scriptPath: '/dist/fluentui-react.min.js'
-  }
-];
 
 export async function buildBundle(appArgs: AppArguments, options: CommonOptions, log: Logger): Promise<void> {
   const tempOutputDirectory = path.resolve(
