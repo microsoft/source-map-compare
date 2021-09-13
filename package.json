@@ -9,9 +9,9 @@
     "build": "tsc",
     "test": "jest",
     "start": "node ./lib/Bundler/source-map-compare",
-    "format": "prettier --write .",
+    "format": "prettier --write src",
     "lint": "eslint \"src/**/*.ts\" -f eslint-formatter-friendly",
-    "ci": "yarn run format && yarn run lint && yarn build && yarn test --ci"
+    "ci": "prettier -c src && yarn run lint && yarn build && yarn test --ci"
   },
   "bin": {
     "source-map-compare": "./lib/Bundler/source-map-compare.js"
