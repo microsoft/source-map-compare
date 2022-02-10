@@ -9,13 +9,13 @@ export interface ExternalLib {
 export const externalLibs: ExternalLib[] = [
   {
     packageName: 'react',
-    packageSemver: '^16.11.0',
+    packageSemver: '^17.0.1',
     libraryVariable: 'React',
     scriptPath: '/umd/react.production.min.js'
   },
   {
     packageName: 'react-dom',
-    packageSemver: '^16.11.0',
+    packageSemver: '^17.0.1',
     libraryVariable: 'ReactDOM',
     scriptPath: '/umd/react-dom.production.min.js'
   },
