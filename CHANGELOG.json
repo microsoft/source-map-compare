@@ -2,6 +2,21 @@
   "name": "source-map-compare",
   "entries": [
     {
+      "date": "Thu, 10 Feb 2022 16:27:55 GMT",
+      "tag": "source-map-compare_v0.2.0",
+      "version": "0.2.0",
+      "comments": {
+        "minor": [
+          {
+            "author": "gibhatna@microsoft.com",
+            "package": "source-map-compare",
+            "comment": "Bump React to 17",
+            "commit": "66ee75b3d052cb5c10e1be2670afbb91c83c82e2"
+          }
+        ]
+      }
+    },
+    {
       "date": "Mon, 13 Sep 2021 21:10:52 GMT",
       "tag": "source-map-compare_v0.1.2",
       "version": "0.1.2",

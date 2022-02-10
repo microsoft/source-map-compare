@@ -1,6 +1,6 @@
 {
   "name": "source-map-compare",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "A tool for analyzing and comparing JavaScript bundles",
   "repository": "https://github.com/microsoft/source-map-compare.git",
   "main": "lib/index.js",
