@@ -1,0 +1,7 @@
+{
+  "type": "minor",
+  "comment": "Bump React to 17",
+  "packageName": "source-map-compare",
+  "email": "gibhatna@microsoft.com",
+  "dependentChangeType": "patch"
+}
