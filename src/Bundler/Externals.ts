@@ -18,11 +18,5 @@ export const externalLibs: ExternalLib[] = [
     packageSemver: '^18.2.0',
     libraryVariable: 'ReactDOM',
     scriptPath: '/umd/react-dom.production.min.js'
-  },
-  {
-    packageName: '@fluentui/react-components',
-    packageSemver: '^9.48.0',
-    libraryVariable: 'FluentUIReact',
-    scriptPath: '/lib-commonjs/index.js'
   }
 ];

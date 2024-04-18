@@ -47,7 +47,8 @@ export async function buildBundle(appArgs: AppArguments, options: CommonOptions,
         test: /\.[tj]sx?$/
       }),
       new HtmlWebpackPlugin({
-        title: `Bundle Size Viewer - ${bundleName}`
+        title: `Bundle Size Viewer - ${bundleName}`,
+        inject: 'body'
       }),
       new InlineChunkHtmlPlugin({
         tests: [
