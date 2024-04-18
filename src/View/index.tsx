@@ -1,12 +1,14 @@
-import { initializeIcons } from '@fluentui/react';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
-import { AppArguments } from '../AppArguments';
+import type { AppArguments } from '../AppArguments';
 import { BundleComparisonApp, SingleBundleApp } from './App';
 
-initializeIcons();
-
 // Allow arguments to be injected via Webpack BannerPlugin
+declare global {
+  interface Window {
+    APP_ARGUMENTS: AppArguments;
+  }
+}
 const args: AppArguments = window['APP_ARGUMENTS'];
 let root: React.ReactElement;
 

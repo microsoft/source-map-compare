@@ -1,19 +1,28 @@
 {
+  "root": true,
+  "extends": [
+    "eslint:recommended",
+    "plugin:@microsoft/sdl/required",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:jest/recommended",
+    "plugin:jsx-a11y/recommended",
+    // Disable any rules which may conflict with prettier.
+    "prettier"
+  ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": 2018,
     "sourceType": "module"
   },
-  "ignorePatterns": ["wtf/**/*", "*.js"],
-  "plugins": ["@typescript-eslint"],
-  "extends": [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/eslint-recommended",
-    "plugin:@typescript-eslint/recommended",
-    "prettier",
-    "prettier/@typescript-eslint"
-  ],
+  "plugins": ["jest", "@typescript-eslint", "jsx-a11y", "import"],
+  "settings": {
+    "react": { "version": 18 },
+    "import/parsers": {
+      "@typescript-eslint/parser": [".ts", ".tsx"]
+    }
+  },
   "rules": {
+    "@typescript-eslint/consistent-type-imports": ["error", { "disallowTypeAnnotations": false }],
     "@typescript-eslint/no-parameter-properties": "off",
     "@typescript-eslint/no-unused-vars": "off",
     "@typescript-eslint/indent": "off",

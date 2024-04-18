@@ -1,18 +1,16 @@
-import { Logger } from '@caporal/core';
+import type { Logger } from '@caporal/core';
 import { execSync } from 'child_process';
 import { promises as fsPromises, mkdirSync } from 'fs';
 import { default as HtmlWebpackPlugin } from 'html-webpack-plugin';
 import * as os from 'os';
 import * as path from 'path';
-import { default as rimrafAsync } from 'rimraf';
+import { rimraf } from 'rimraf';
 import { promisify } from 'util';
 import webpack from 'webpack';
-import { AppArguments } from '../AppArguments';
+import type { AppArguments } from '../AppArguments';
 import { externalLibs } from './Externals';
 import { InlineChunkHtmlPlugin } from './InlineChunkHtmlPlugin';
-import { CommonOptions } from './Options';
-
-const rimraf = promisify(rimrafAsync);
+import type { CommonOptions } from './Options';
 
 export async function buildBundle(appArgs: AppArguments, options: CommonOptions, log: Logger): Promise<void> {
   const tempOutputDirectory = path.resolve(
@@ -73,11 +71,11 @@ export async function buildBundle(appArgs: AppArguments, options: CommonOptions,
   // Run webpack compiler
   const compileResult = await promisify(compiler.run.bind(compiler) as typeof compiler.run)();
 
-  if (compileResult.hasWarnings()) {
+  if (compileResult?.hasWarnings()) {
     log.debug('Webpack Warnings', compileResult.compilation.warnings.map(String));
   }
 
-  if (compileResult.hasErrors()) {
+  if (compileResult?.hasErrors()) {
     log.error(compileResult.compilation.errors);
     throw new Error(`Webpack encountered errors: ${compileResult.compilation.errors}`);
   }

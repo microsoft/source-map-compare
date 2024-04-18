@@ -1,109 +1,146 @@
-import { IColumn, Icon, mergeStyleSets } from '@fluentui/react';
 import * as React from 'react';
-import { ComparisonListItem } from '../Model/BundleComparison';
-import { ListItem } from '../Model/FileList';
-import { SizeListItem } from '../Model/SingleBundle';
+import type { TableColumnSizingOptions, TableColumnDefinition } from '@fluentui/react-components';
+import { ChevronDownRegular, ChevronRightRegular, JavascriptRegular } from '@fluentui/react-icons';
+import type { ComparisonListItem } from '../Model/BundleComparison';
+import type { ListItem } from '../Model/FileList';
+import type { SizeListItem } from '../Model/SingleBundle';
+import { CellValue } from './CellValue';
+import { ByteFormat, PercentageFormat, SignedFormat, colorDirection, colorFraction } from './CellFormats';
 
-const stringifyNumWithCommaSeparators = (num: number): string =>
-  String(num)
-    .split('')
-    .map((digit, idx, arr) => ((arr.length - idx) % 3 === 0 && idx > 0 ? `,${digit}` : digit))
-    .join('');
+export interface ColumnInfo<T> {
+  columnDef: TableColumnDefinition<T>;
+  sizeOptions: TableColumnSizingOptions[string];
+}
 
-const classNames = mergeStyleSets({
-  numericColumn: {
-    textAlign: 'right'
+const numericColumnSizeOptions: TableColumnSizingOptions[string] = {
+  minWidth: 80
+};
+
+function compareListItem(a: ListItem<unknown, unknown, unknown>, b: ListItem<unknown, unknown, unknown>): number {
+  return a.name.localeCompare(b.name);
+}
+
+function compareSizeItem(a: SizeListItem, b: SizeListItem): number {
+  return a.meta.size - b.meta.size;
+}
+
+const nameColumn: ColumnInfo<ListItem<unknown, unknown, unknown>> = {
+  sizeOptions: {
+    minWidth: 120
+  },
+  columnDef: {
+    columnId: 'name',
+    compare: compareListItem,
+    renderHeaderCell: () => 'Name',
+    renderCell: (item: ListItem<unknown, unknown, unknown>) => (
+      <span style={{ paddingLeft: item.level * 24 }}>
+        {item.isDirectory ? item.expanded ? <ChevronDownRegular /> : <ChevronRightRegular /> : <JavascriptRegular />}
+        <span style={{ marginLeft: 10 }}>{item.name}</span>
+      </span>
+    )
   }
-});
-
-const renderFraction = (val: number): JSX.Element => {
-  let rgb: [number, number, number];
-
-  if (val >= 0) {
-    // Red shade
-    const colorVal = Math.min(Math.round((1 - val) * 155) + 100, 255);
-    rgb = [255, colorVal, colorVal];
-  } else {
-    // Green shade
-    const colorVal = Math.min(Math.round((val + 1) * 155) + 100, 255);
-    rgb = [colorVal, 255, colorVal];
-  }
-
-  return <div style={{ backgroundColor: `rgb(${rgb.join(',')})` }}>{`${(val * 100).toFixed(2)}%`}</div>;
 };
 
-const numericColumnBase: Omit<IColumn, 'key' | 'name'> = {
-  minWidth: 80,
-  isResizable: true,
-  className: classNames.numericColumn
-};
-
-const nameColumn: IColumn = {
-  key: 'name',
-  name: 'Name',
-  fieldName: 'name',
-  minWidth: 120,
-  isResizable: true,
-  onRender: (item: ListItem<unknown, unknown, unknown>) => (
-    <span style={{ paddingLeft: item.level * 24 }}>
-      <Icon iconName={item.isDirectory ? (item.expanded ? 'ChevronDownMed' : 'ChevronRightMed') : 'FileCode'} />
-      <span style={{ marginLeft: 10 }}>{item.name}</span>
-    </span>
-  )
-};
-
-export const singleBundleColumns: IColumn[] = [
+export const singleBundleColumns: ColumnInfo<SizeListItem>[] = [
   nameColumn,
   {
-    key: 'size',
-    name: 'Size',
-    ...numericColumnBase,
-    onRender: (item: SizeListItem) => stringifyNumWithCommaSeparators(item.meta.size)
+    sizeOptions: numericColumnSizeOptions,
+    columnDef: {
+      columnId: 'size',
+      compare: compareSizeItem,
+      renderHeaderCell: () => 'Size',
+      renderCell: (item: SizeListItem) => <CellValue value={item.meta.size} format={ByteFormat} />
+    }
   },
   {
-    key: 'pctSize',
-    name: '% Size',
-    ...numericColumnBase,
-    onRender: (item: SizeListItem) => renderFraction(item.descendantInfo.ratioOfTotal)
+    sizeOptions: numericColumnSizeOptions,
+    columnDef: {
+      columnId: 'pctSize',
+      compare: compareSizeItem,
+      renderHeaderCell: () => '% Size',
+      renderCell: (item: SizeListItem) => (
+        <CellValue value={item.descendantInfo.ratioOfTotal} background={colorFraction} format={PercentageFormat} />
+      )
+    }
   },
   {
-    key: 'pctSizeParent',
-    name: '% Size in Parent',
-    ...numericColumnBase,
-    onRender: (item: SizeListItem) => renderFraction(item.descendantInfo.ratioOfParent)
+    sizeOptions: numericColumnSizeOptions,
+    columnDef: {
+      columnId: 'pctSizeParent',
+      compare: compareSizeItem,
+      renderHeaderCell: () => '% Size in Parent',
+      renderCell: (item: SizeListItem) => (
+        <CellValue value={item.descendantInfo.ratioOfParent} background={colorFraction} format={PercentageFormat} />
+      )
+    }
   }
 ];
 
-export const bundleComparisonColumns: IColumn[] = [
+export const bundleComparisonColumns: ColumnInfo<ComparisonListItem>[] = [
   nameColumn,
   {
-    key: 'leftSize',
-    name: 'Left Size',
-    ...numericColumnBase,
-    onRender: (item: ComparisonListItem) =>
-      item.meta.leftSize === 0 ? '--' : stringifyNumWithCommaSeparators(item.meta.leftSize)
+    sizeOptions: numericColumnSizeOptions,
+    columnDef: {
+      columnId: 'leftSize',
+      renderHeaderCell: () => 'Left Size',
+      compare: (a, b) => a.meta.leftSize - b.meta.leftSize,
+      renderCell: (item: ComparisonListItem) => <CellValue value={item.meta.leftSize} format={ByteFormat} />
+    }
   },
   {
-    key: 'rightSize',
-    name: 'Right Size',
-    ...numericColumnBase,
-    onRender: (item: ComparisonListItem) =>
-      item.meta.rightSize === 0 ? '--' : stringifyNumWithCommaSeparators(item.meta.rightSize)
+    sizeOptions: numericColumnSizeOptions,
+    columnDef: {
+      columnId: 'rightSize',
+      renderHeaderCell: () => 'Right Size',
+      compare: (a, b) => a.meta.rightSize - b.meta.rightSize,
+      renderCell: (item: ComparisonListItem) => <CellValue value={item.meta.rightSize} format={ByteFormat} />
+    }
   },
   {
-    key: 'pctSizeChange',
-    name: '% Size Change',
-    ...numericColumnBase,
-    onRender: (item: ComparisonListItem) =>
-      item.meta.leftSize > 0 ? renderFraction((item.meta.rightSize - item.meta.leftSize) / item.meta.leftSize) : '--'
+    sizeOptions: numericColumnSizeOptions,
+    columnDef: {
+      columnId: 'changeSize',
+      renderHeaderCell: () => 'Change',
+      compare: (a, b) => a.meta.rightSize - a.meta.leftSize - (b.meta.rightSize - b.meta.leftSize),
+      renderCell: (item: ComparisonListItem) => (
+        <CellValue
+          value={item.meta.rightSize - item.meta.leftSize}
+          color={colorDirection}
+          format={[ByteFormat, SignedFormat]}
+        />
+      )
+    }
   },
   {
-    key: 'pctTotalChange',
-    name: '% Total Change',
-    ...numericColumnBase,
-    onRender: (item: ComparisonListItem) =>
-      Number.isFinite(item.descendantInfo.ratioChangeOfTotal) && item.descendantInfo.ratioChangeOfTotal !== 0
-        ? renderFraction(item.descendantInfo.ratioChangeOfTotal)
-        : '--'
+    sizeOptions: numericColumnSizeOptions,
+    columnDef: {
+      columnId: 'pctSizeChange',
+      renderHeaderCell: () => '% Size Change',
+      compare: (a, b) =>
+        (a.meta.rightSize - a.meta.leftSize) / a.meta.leftSize -
+        (b.meta.rightSize - b.meta.rightSize) / b.meta.rightSize,
+      renderCell: (item: ComparisonListItem) => (
+        <CellValue
+          value={item.meta.rightSize - item.meta.leftSize}
+          color={colorDirection}
+          format={[ByteFormat, SignedFormat]}
+        />
+      )
+    }
+  },
+  {
+    sizeOptions: numericColumnSizeOptions,
+    columnDef: {
+      columnId: 'pctTotalChange',
+      renderHeaderCell: () => '% Total Change',
+      compare: (a, b) => a.descendantInfo.ratioChangeOfTotal - b.descendantInfo.ratioChangeOfTotal,
+      renderCell: (item: ComparisonListItem) => (
+        <CellValue
+          value={item.descendantInfo.ratioChangeOfTotal}
+          background={colorFraction}
+          format={PercentageFormat}
+        />
+      )
+    }
   }
 ];

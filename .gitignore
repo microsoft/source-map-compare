@@ -105,3 +105,6 @@ dist
 
 # TS output
 lib/
+
+# local test files
+.local/

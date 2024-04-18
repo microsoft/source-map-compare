@@ -1,5 +1,5 @@
 import { notReached } from '../Helpers/FunctionalUtils';
-import { FileTree, FileTreeDirectory, FileTreeFile } from './FileTree';
+import type { FileTree, FileTreeDirectory, FileTreeFile } from './FileTree';
 
 export type ListItem<TMeta, TAgg, TDescendentInfo> = {
   name: string;

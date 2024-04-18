@@ -1,13 +1,13 @@
 #!/usr/bin/env node
-import { program, Action, Logger } from '@caporal/core';
+import { program, type Action, type Logger, type ActionParameters } from '@caporal/core';
 import { readFile as readFileAsync } from 'fs';
 import * as path from 'path';
-import * as SME from 'source-map-explorer';
-import { ActionParameters } from 'types';
+import type * as SME from 'source-map-explorer/lib/types';
+import { explore } from 'source-map-explorer';
 import { promisify } from 'util';
-import { AppArguments, BundleStats } from '../AppArguments';
+import type { AppArguments, BundleStats } from '../AppArguments';
 import { buildBundle } from './BuildBundle';
-import { CommonOptions, OUTPUT_FLAVORS } from './Options';
+import { type CommonOptions, OUTPUT_FLAVORS } from './Options';
 
 const readFile = promisify(readFileAsync);
 
@@ -23,6 +23,11 @@ interface SingleBundleArgs {
   sourcemap?: string;
 }
 
+function isSMEExploreResultError(value: unknown): value is SME.ExploreResult {
+  const exploreResult = value as SME.ExploreResult;
+  return exploreResult.errors !== undefined && Array.isArray(exploreResult.errors);
+}
+
 async function getStats(log: Logger, mainPath: string, sourcemapPath?: string): Promise<SME.ExploreResult> {
   if (path.extname(mainPath) === '.json') {
     // Already processed stats file
@@ -36,9 +41,9 @@ async function getStats(log: Logger, mainPath: string, sourcemapPath?: string): 
   let result: SME.ExploreResult;
 
   try {
-    result = await SME.explore({ code: mainPath, map: sourcemapPath }, { output: { format: 'json' } });
+    result = await explore({ code: mainPath, map: sourcemapPath }, { output: { format: 'json' } });
   } catch (err) {
-    if (typeof err.errors === 'object') {
+    if (isSMEExploreResultError(err)) {
       // SME throws a ExploreResult object in case of errors
       result = err;
     } else {
@@ -64,7 +69,7 @@ function actionWrapper<
   TModifiedParams = Omit<ActionParameters, 'args' | 'options'> & { args: Args; options: Options }
 >(cb: (params: TModifiedParams) => Promise<void>): Action {
   return (params: ActionParameters) =>
-    cb((params as unknown) as TModifiedParams).catch(err => {
+    cb(params as unknown as TModifiedParams).catch(err => {
       const { logger } = params;
       logger.error(String(err));
       process.exit(1);

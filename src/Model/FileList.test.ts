@@ -1,4 +1,4 @@
-import { BundlePathInfo, parseBundlePath } from './FileTree';
+import { type BundlePathInfo, parseBundlePath } from './FileTree';
 
 describe('parseBundlePath', () => {
   it('Parses absolute windows paths correctly', () =>

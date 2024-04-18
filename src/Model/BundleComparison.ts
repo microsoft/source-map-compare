@@ -1,7 +1,6 @@
-import * as SME from 'source-map-explorer';
-import { isTruthy } from '../Helpers/TypeUtils';
-import { DescendantInfoPredicate, ListItem } from './FileList';
-import { FileTree, makeFileTree, reduceFileTree } from './FileTree';
+import type * as SME from 'source-map-explorer/lib/types';
+import type { DescendantInfoPredicate, ListItem } from './FileList';
+import { type FileTree, makeFileTree, reduceFileTree } from './FileTree';
 
 export type ComparisonMetadata = { leftSize: number; rightSize: number };
 
@@ -21,12 +20,12 @@ export function makeComparisonFileTree(
   }
 
   for (const [filepath, data] of Object.entries(rightBundleInfo.files)) {
-    const normalizedfilepath = normalizeFilepath(filepath);
-    const leftValue = diffMap.get(normalizedfilepath);
+    const normalizedFilePath = normalizeFilepath(filepath);
+    const leftValue = diffMap.get(normalizedFilePath);
     if (leftValue) {
       leftValue.rightSize = data.size;
     } else {
-      diffMap.set(normalizedfilepath, { leftSize: 0, rightSize: data.size });
+      diffMap.set(normalizedFilePath, { leftSize: 0, rightSize: data.size });
     }
   }
 
@@ -35,10 +34,10 @@ export function makeComparisonFileTree(
     // Reducer to add up cumulative size of sub-tree
     (files, subdirectories): ComparisonMetadata =>
       // eslint-disable-next-line no-restricted-syntax
-      [...Object.values(files), ...Object.values(subdirectories)].filter(isTruthy).reduce<ComparisonMetadata>(
+      [...Object.values(files), ...Object.values(subdirectories)].filter(Boolean).reduce<ComparisonMetadata>(
         (prev, next) => ({
-          leftSize: prev.leftSize + next.meta.leftSize,
-          rightSize: prev.rightSize + next.meta.rightSize
+          leftSize: prev.leftSize + (next?.meta.leftSize ?? 0),
+          rightSize: prev.rightSize + (next?.meta.rightSize ?? 0)
         }),
         { leftSize: 0, rightSize: 0 }
       )

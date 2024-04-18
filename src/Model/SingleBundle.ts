@@ -1,7 +1,6 @@
-import * as SME from 'source-map-explorer';
-import { isTruthy } from '../Helpers/TypeUtils';
-import { DescendantInfoPredicate, ListItem } from './FileList';
-import { FileTree, makeFileTree, reduceFileTree } from './FileTree';
+import type * as SME from 'source-map-explorer/lib/types';
+import type { DescendantInfoPredicate, ListItem } from './FileList';
+import { type FileTree, makeFileTree, reduceFileTree } from './FileTree';
 
 export type SizeFileTree = FileTree<SME.FileData, SME.FileData>;
 
@@ -12,8 +11,8 @@ export function makeFileTreeFromSingleBundle(bundleInfo: SME.ExploreBundleResult
     (files, subdirectories): SME.FileData =>
       // eslint-disable-next-line no-restricted-syntax
       [...Object.values(files), ...Object.values(subdirectories)]
-        .filter(isTruthy)
-        .reduce<SME.FileData>((prev, next) => ({ size: prev.size + next.meta.size }), { size: 0 })
+        .filter(Boolean)
+        .reduce<SME.FileData>((prev, next) => ({ size: prev.size + (next?.meta.size ?? 0) }), { size: 0 })
   );
 }
 

@@ -1,5 +1,6 @@
-import HtmlWebpackPlugin, { HtmlTagObject } from 'html-webpack-plugin';
-import * as webpack from 'webpack';
+import type { HtmlTagObject } from 'html-webpack-plugin';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
+import type * as webpack from 'webpack';
 
 /*
  * Largely adapted from InlineChunkHtmlPlugin in the react-dev-utils package (which contains a lot of other code and dependencies)
@@ -18,7 +19,7 @@ export interface InlineChunkHtmlPluginOptions {
   externals?: string[];
 }
 
-export class InlineChunkHtmlPlugin implements webpack.Plugin {
+export class InlineChunkHtmlPlugin {
   private readonly tests: RegExp[];
   private readonly externals: string[];
 
@@ -29,7 +30,7 @@ export class InlineChunkHtmlPlugin implements webpack.Plugin {
 
   getInlinedTag(
     publicPath: string,
-    assets: webpack.compilation.Compilation['assets'],
+    assets: webpack.Compilation['assets'],
     tag: HtmlTagObject
   ): HtmlTagObject & { closeTag?: boolean } {
     if (tag.tagName !== 'script' || !(tag.attributes && tag.attributes.src)) {
@@ -46,18 +47,25 @@ export class InlineChunkHtmlPlugin implements webpack.Plugin {
     }
     return {
       tagName: 'script',
-      innerHTML: asset.source(),
+      innerHTML: asset.source().toString('utf8'),
       attributes: {},
       voidTag: false,
-      closeTag: true
+      closeTag: true,
+      meta: { plugin: 'InlineChunkHtmlPlugin' }
     };
   }
 
   apply(compiler: webpack.Compiler): void {
-    let publicPath = compiler.options.output?.publicPath ?? '';
-    if (publicPath && !publicPath.endsWith('/')) {
-      publicPath += '/';
-    }
+    const publicPath = (() => {
+      let publicPath = compiler.options.output?.publicPath ?? '';
+      if (typeof publicPath === 'function') {
+        publicPath = publicPath({});
+      }
+      if (publicPath && !publicPath.endsWith('/')) {
+        publicPath += '/';
+      }
+      return publicPath;
+    })();
 
     compiler.hooks.compilation.tap('InlineChunkHtmlPlugin', compilation => {
       const tagFunction = (tag: HtmlTagObject) => this.getInlinedTag(publicPath, compilation.assets, tag);
@@ -70,7 +78,8 @@ export class InlineChunkHtmlPlugin implements webpack.Plugin {
           ...this.externals.map<HtmlTagObject>(externalUrl => ({
             tagName: 'script',
             voidTag: false,
-            attributes: { crossorigin: true, src: externalUrl }
+            attributes: { crossorigin: true, src: externalUrl },
+            meta: { plugin: 'InlineChunkHtmlPlugin' }
           }))
         );
         return assets;

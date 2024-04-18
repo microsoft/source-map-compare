@@ -1,4 +1,4 @@
-import * as SMETypes from 'source-map-explorer';
+import type * as SMETypes from 'source-map-explorer/lib/types';
 
 export type BundleStats = { results: SMETypes.ExploreBundleResult[] };
 
