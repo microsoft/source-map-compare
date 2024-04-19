@@ -7,10 +7,10 @@ import {
   DataGridBody,
   DataGridCell
 } from '@fluentui/react-components';
-import { filterFileTree, type ItemState, type ListItem } from '../Model/FileList';
+import { filterFileTree, type ItemState, type ListItem } from '../../Model';
 import { columnsFromColumnInfo, type ColumnInfo } from './ColumnInfo';
-import { useStyles } from './BundleView.styles';
 import { nameColumn } from './NameColumn';
+import { useStyles } from './BundleView.styles';
 
 const getListItemRowId = (item: ListItem): string => String(item.nodeId);
 

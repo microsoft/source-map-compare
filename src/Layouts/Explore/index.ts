@@ -1,9 +1,9 @@
 import React from 'react';
 import type { ExploreBundleResult, FileData } from 'source-map-explorer/lib/types';
-import { type DescendantSizeInfo, ExploreLayoutBuilder } from './ExploreLayoutBuilder';
 import { type ListItem, makeListFromFileTree } from '../../Model';
+import type { BundleViewProps } from '../../Components';
+import { type DescendantSizeInfo, ExploreLayoutBuilder } from './ExploreLayoutBuilder';
 import { singleBundleColumns } from './ExploreColumns';
-import type { BundleViewProps } from '../../View/BundleView';
 
 function evaluateExploreModel(bundles: ExploreBundleResult[]) {
   const layout = new ExploreLayoutBuilder(bundles);

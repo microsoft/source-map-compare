@@ -1,6 +1,6 @@
 import type * as React from 'react';
 import type { TableColumnDefinition, TableColumnSizingOptions } from '@fluentui/react-components';
-import type { ListItem } from '../Model/FileList';
+import type { ListItem } from '../../Model';
 
 export interface ColumnInfo<TItem extends ListItem> {
   columnId: string;

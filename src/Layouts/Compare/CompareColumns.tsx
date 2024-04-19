@@ -1,8 +1,8 @@
 import React from 'react';
-import { ByteFormat, colorDirection, SignedFormat, colorFraction, PercentageFormat, CellValue } from '../../View/Cells';
-import type { ColumnInfo } from '../../View/ColumnInfo';
-import type { BundleComparison, DescendantComparisonInfo } from './CompareLayoutBuilder';
 import type { ListItem } from '../../Model';
+import type { ColumnInfo } from '../../Components/BundleView/ColumnInfo';
+import { ByteFormat, colorDirection, SignedFormat, colorFraction, PercentageFormat, CellValue } from '../../Components';
+import type { BundleComparison, DescendantComparisonInfo } from './CompareLayoutBuilder';
 
 export const bundleComparisonColumns: ColumnInfo<
   ListItem<BundleComparison, BundleComparison, DescendantComparisonInfo>

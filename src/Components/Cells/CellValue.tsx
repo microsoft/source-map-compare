@@ -1,7 +1,5 @@
 import React from 'react';
-import { ChevronDown24Regular, ChevronRight24Regular, Javascript24Regular } from '@fluentui/react-icons';
 import { useStyles } from './CellValue.styles';
-import type { ListItem } from '../../Model';
 
 export type ColorFunction = (val: number) => `rgb(${number},${number},${number})` | undefined;
 
@@ -16,23 +14,6 @@ export interface CellValueProps {
   color?: ColorFunction;
   background?: ColorFunction;
 }
-
-export const NameCell: React.FC<{ item: ListItem }> = ({ item }) => {
-  const styles = useStyles();
-  return (
-    <div className={styles.nameCell} style={{ paddingLeft: item.level * 24 }}>
-      {item.isDirectory ? (
-        <>
-          <ChevronDown24Regular className="expanded" />
-          <ChevronRight24Regular className="collapsed" />
-        </>
-      ) : (
-        <Javascript24Regular />
-      )}
-      <span className={styles.nameLabel}>{item.name}</span>
-    </div>
-  );
-};
 
 export const CellValue: React.FC<CellValueProps> = ({ value, format, color, background }) => {
   const { numericCell } = useStyles();

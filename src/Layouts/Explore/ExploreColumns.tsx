@@ -1,9 +1,8 @@
 import React from 'react';
 import type { FileData } from 'source-map-explorer/lib/types';
-import { ByteFormat, colorFraction, PercentageFormat, CellValue } from '../../View/Cells';
-import type { ColumnInfo } from '../../View/ColumnInfo';
-import type { DescendantSizeInfo } from './ExploreLayoutBuilder';
 import type { ListItem } from '../../Model';
+import { ByteFormat, colorFraction, PercentageFormat, CellValue, type ColumnInfo } from '../../Components';
+import type { DescendantSizeInfo } from './ExploreLayoutBuilder';
 
 const exploreColumnBase = {
   minWidth: 80,

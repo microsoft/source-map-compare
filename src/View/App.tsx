@@ -1,7 +1,7 @@
 import React from 'react';
-import { BundleView } from './BundleView';
 import type { AppArguments } from '../AppArguments';
 import { useCompareModel, useExploreModel } from '../Layouts';
+import { BundleView } from '../Components';
 
 export interface AppProps {
   args: AppArguments;

@@ -1,9 +1,9 @@
 import React from 'react';
 import type { ExploreBundleResult } from 'source-map-explorer/lib/types';
-import { type BundleComparison, CompareLayoutBuilder, type DescendantComparisonInfo } from './CompareLayoutBuilder';
+import type { BundleViewProps } from '../../Components';
 import { type ListItem, makeListFromFileTree } from '../../Model';
+import { type BundleComparison, CompareLayoutBuilder, type DescendantComparisonInfo } from './CompareLayoutBuilder';
 import { bundleComparisonColumns } from './CompareColumns';
-import type { BundleViewProps } from '../../View/BundleView';
 
 function evaluateCompareModel(baselines: ExploreBundleResult[], comparisons: ExploreBundleResult[]) {
   const layout = new CompareLayoutBuilder(baselines, comparisons);
