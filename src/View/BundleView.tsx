@@ -36,6 +36,7 @@ export function BundleView<TItem extends ListItem>(props: BundleViewProps<TItem>
 
   return (
     <DataGrid
+      size="extra-small"
       items={items}
       columns={columns}
       columnSizingOptions={columnSizingOptions}

@@ -23,6 +23,7 @@ export interface FileTreeDirectory<TMeta, TAgg> extends FileTreeNode {
   files: Record<string, FileTreeFile<TMeta> | undefined>;
   subdirectories: Record<string, FileTreeDirectory<TMeta, TAgg> | undefined>;
 }
+
 export type FileTree<TMeta, TAgg> = FileTreeDirectory<TMeta, TAgg>;
 
 export interface BundlePathInfo {

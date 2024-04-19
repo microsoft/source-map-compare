@@ -71,6 +71,12 @@ const flattenFileTree = <TMeta, TAgg>(fileTree: FileTree<TMeta, TAgg>): SearchRe
   return results;
 };
 
+export interface TreeDescendantContext<TMeta, TAgg> {
+  curr: FileTreeDirectory<TMeta, TAgg> | FileTreeFile<TMeta>;
+  parent: FileTreeDirectory<TMeta, TAgg> | undefined;
+  root: FileTree<TMeta, TAgg>;
+}
+
 export type DescendantInfoPredicate<TMeta, TAgg, TDescendentInfo> = (
   curr: FileTreeDirectory<TMeta, TAgg> | FileTreeFile<TMeta>,
   parent: FileTreeDirectory<TMeta, TAgg> | undefined,

@@ -1,55 +1,9 @@
 import React from 'react';
-import type { ComparisonListItem } from '../Model/BundleComparison';
-import type { ListItem } from '../Model/FileList';
-import type { SizeListItem } from '../Model/SingleBundle';
-import { CellValue, NameCell } from './CellValue';
-import { ByteFormat, PercentageFormat, SignedFormat, colorDirection, colorFraction } from './CellFormats';
-import type { ColumnInfo } from './ColumnInfo';
-
-function compareListItem(a: ListItem, b: ListItem): number {
-  return a.name.localeCompare(b.name);
-}
-
-function compareSizeItem(a: SizeListItem, b: SizeListItem): number {
-  return a.meta.size - b.meta.size;
-}
-
-const nameColumn: ColumnInfo<ListItem> = {
-  minWidth: 120,
-  columnId: 'name',
-  compare: compareListItem,
-  label: 'Name',
-  renderCell: (item: ListItem) => <NameCell item={item} />
-};
-
-export const singleBundleColumns: ColumnInfo<SizeListItem>[] = [
-  nameColumn,
-  {
-    minWidth: 80,
-    columnId: 'size',
-    compare: compareSizeItem,
-    label: 'Size',
-    renderCell: (item: SizeListItem) => <CellValue value={item.meta.size} format={ByteFormat} />
-  },
-  {
-    minWidth: 80,
-    columnId: 'pctSize',
-    compare: compareSizeItem,
-    label: '% Size',
-    renderCell: (item: SizeListItem) => (
-      <CellValue value={item.descendantInfo.ratioOfTotal} background={colorFraction} format={PercentageFormat} />
-    )
-  },
-  {
-    minWidth: 80,
-    columnId: 'pctSizeParent',
-    compare: compareSizeItem,
-    label: '% Size in Parent',
-    renderCell: (item: SizeListItem) => (
-      <CellValue value={item.descendantInfo.ratioOfParent} background={colorFraction} format={PercentageFormat} />
-    )
-  }
-];
+import type { ComparisonListItem } from '../../../Model/BundleComparison';
+import { ByteFormat, colorDirection, SignedFormat, colorFraction, PercentageFormat } from '../../CellFormats';
+import { CellValue } from '../../CellValue';
+import type { ColumnInfo } from '../../ColumnInfo';
+import { nameColumn } from '../Common';
 
 export const bundleComparisonColumns: ColumnInfo<ComparisonListItem>[] = [
   nameColumn,
