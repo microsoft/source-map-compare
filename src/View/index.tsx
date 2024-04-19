@@ -1,7 +1,8 @@
-import * as React from 'react';
-import * as ReactDom from 'react-dom';
+import React from 'react';
+import ReactDom from 'react-dom';
 import type { AppArguments } from '../AppArguments';
-import { BundleComparisonApp, SingleBundleApp } from './App';
+import { App } from './App';
+import { FluentProvider, webDarkTheme, webLightTheme } from '@fluentui/react-components';
 
 // Allow arguments to be injected via Webpack BannerPlugin
 declare global {
@@ -10,16 +11,18 @@ declare global {
   }
 }
 const args: AppArguments = window['APP_ARGUMENTS'];
-let root: React.ReactElement;
-
-if (args.mode === 'comparison') {
-  root = <BundleComparisonApp leftBundle={args.leftBundle} rightBundle={args.rightBundle} />;
-} else {
-  root = <SingleBundleApp exploredBundle={args.bundle} />;
-}
 
 const rootElement = document.createElement('div');
 rootElement.id = 'root';
 document.body.appendChild(rootElement);
 
-ReactDom.render(root, document.getElementById('root'));
+function isDarkModeEnabled() {
+  return window.matchMedia?.('(prefers-color-scheme: dark)').matches;
+}
+
+ReactDom.render(
+  <FluentProvider theme={isDarkModeEnabled() ? webDarkTheme : webLightTheme}>
+    <App args={args} />
+  </FluentProvider>,
+  document.getElementById('root')
+);

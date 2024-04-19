@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { useStyles } from './CellValue.styles';
 
 export type ColorFunction = (val: number) => `rgb(${number},${number},${number})` | undefined;

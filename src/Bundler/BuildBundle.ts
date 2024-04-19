@@ -23,7 +23,7 @@ export async function buildBundle(appArgs: AppArguments, options: CommonOptions,
   log.info(`Outputting webpack build to ${tempOutputDirectory}`);
 
   const isProduction = (options.outputFlavor ?? 'production') === 'production';
-  const bundleName = appArgs.mode === 'comparison' ? appArgs.rightBundle.bundleName : appArgs.bundle.bundleName;
+  const bundleName = appArgs.mode === 'comparison' ? appArgs.compare.bundleName : appArgs.bundle.bundleName;
 
   const config: webpack.Configuration = {
     mode: isProduction ? 'production' : 'development',

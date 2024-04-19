@@ -84,8 +84,8 @@ const compareBundles: Action = actionWrapper<CompareArgs, CommonOptions>(async (
 
   const appArgs: AppArguments = {
     mode: 'comparison',
-    leftBundle: leftExploreResult.bundles[0],
-    rightBundle: rightExploreResult.bundles[0]
+    baseline: leftExploreResult.bundles[0],
+    compare: rightExploreResult.bundles[0]
   };
 
   return buildBundle(appArgs, options, logger);

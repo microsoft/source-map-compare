@@ -9,17 +9,17 @@ export type ComparisonFileTree = FileTree<ComparisonMetadata, ComparisonMetadata
 const normalizeFilepath = (filepath: string) => filepath.replace(/.+[/\\]node_modules[/\\]/, '//node_modules/');
 
 export function makeComparisonFileTree(
-  leftBundleInfo: SME.ExploreBundleResult,
-  rightBundleInfo: SME.ExploreBundleResult
+  baselineInfo: SME.ExploreBundleResult,
+  compareInfo: SME.ExploreBundleResult
 ): ComparisonFileTree {
   // merge contents
   const diffMap = new Map<string, ComparisonMetadata>();
 
-  for (const [filepath, data] of Object.entries(leftBundleInfo.files)) {
+  for (const [filepath, data] of Object.entries(baselineInfo.files)) {
     diffMap.set(normalizeFilepath(filepath), { leftSize: data.size, rightSize: 0 });
   }
 
-  for (const [filepath, data] of Object.entries(rightBundleInfo.files)) {
+  for (const [filepath, data] of Object.entries(compareInfo.files)) {
     const normalizedFilePath = normalizeFilepath(filepath);
     const leftValue = diffMap.get(normalizedFilePath);
     if (leftValue) {

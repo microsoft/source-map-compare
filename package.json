@@ -13,7 +13,7 @@
     "ci": "conc npm:lint npm:test npm:format:check npm:build",
     "format": "prettier --write src",
     "format:check": "prettier -c src",
-    "lint": "eslint \"src/**/*.ts\" -f eslint-formatter-friendly",
+    "lint": "eslint .",
     "start": "node ./lib/Bundler/source-map-compare",
     "test": "jest"
   },
@@ -47,7 +47,6 @@
     "concurrently": "^8.2.2",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
-    "eslint-formatter-friendly": "^7.0.0",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-jest": "^28.2.0",
     "eslint-plugin-jsx-a11y": "^6.8.0",

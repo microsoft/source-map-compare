@@ -1,33 +1,45 @@
 import { notReached } from '../Helpers/FunctionalUtils';
 import type { FileTree, FileTreeDirectory, FileTreeFile } from './FileTree';
 
-export type ListItem<TMeta, TAgg, TDescendentInfo> = {
+export interface ListItemBase<TDescendentInfo = unknown> {
   name: string;
   nodeId: number;
+  parentNodeId: number | undefined;
   level: number;
-  /**
-   * Tnformation about this node relative to its parent and root
-   */
+  /** Information about this node relative to its parent and root */
   descendantInfo: TDescendentInfo;
-} & ({ isDirectory: true; expanded: boolean; meta: TAgg } | { isDirectory: false; filepath: string; meta: TMeta });
+}
+
+export interface GroupListItem<TAgg = unknown, TDescendentInfo = unknown> extends ListItemBase<TDescendentInfo> {
+  isDirectory: true;
+  meta: TAgg;
+}
+
+export interface LeafListItem<TMeta = unknown, TDescendentInfo = unknown> extends ListItemBase<TDescendentInfo> {
+  isDirectory: false;
+  filepath: string;
+  meta: TMeta;
+}
+
+export type ListItem<TMeta = unknown, TAgg = unknown, TDescendentInfo = unknown> =
+  | GroupListItem<TAgg, TDescendentInfo>
+  | LeafListItem<TMeta, TDescendentInfo>;
+
+export interface ItemState {
+  expanded: boolean;
+}
 
 type SearchResult<TMeta, TAgg> = { depth: number; parent: FileTreeDirectory<TMeta, TAgg> | undefined } & (
   | { val: FileTreeDirectory<TMeta, TAgg>; isDirectory: true }
   | { val: FileTreeFile<TMeta>; isDirectory: false }
 );
 
-export type ExpandState = Record<number, boolean>;
-
 /**
  * Performs an iterative depth-first search over the FileTree
  *
  * @param fileTree
- * @param expandState
  */
-const flattenFileTree = <TMeta, TAgg>(
-  fileTree: FileTree<TMeta, TAgg>,
-  expandState: ExpandState
-): SearchResult<TMeta, TAgg>[] => {
+const flattenFileTree = <TMeta, TAgg>(fileTree: FileTree<TMeta, TAgg>): SearchResult<TMeta, TAgg>[] => {
   const results: SearchResult<TMeta, TAgg>[] = [];
 
   type StackFrame = {
@@ -42,11 +54,6 @@ const flattenFileTree = <TMeta, TAgg>(
     results.push({ ...curr, isDirectory: true });
 
     const { depth, val } = curr;
-
-    if (!expandState[val.nodeId]) {
-      // If not expanded, skip children
-      continue;
-    }
 
     // iterate over directories in alphabetic order
     stack.push(
@@ -72,19 +79,18 @@ export type DescendantInfoPredicate<TMeta, TAgg, TDescendentInfo> = (
 
 export const makeListFromFileTree = <TMeta, TAgg, TDescendentInfo>(
   root: FileTree<TMeta, TAgg>,
-  expandState: ExpandState,
   makeDescendantInfo: DescendantInfoPredicate<TMeta, TAgg, TDescendentInfo>
 ): ListItem<TMeta, TAgg, TDescendentInfo>[] =>
-  flattenFileTree(root, expandState).map<ListItem<TMeta, TAgg, TDescendentInfo>>(result => ({
+  flattenFileTree(root).map<ListItem<TMeta, TAgg, TDescendentInfo>>(result => ({
     level: result.depth,
     name: result.val.name,
 
     nodeId: result.val.nodeId,
+    parentNodeId: result.parent?.nodeId,
     descendantInfo: makeDescendantInfo(result.val, result.parent, root),
     ...(result.isDirectory
       ? {
           isDirectory: true,
-          expanded: expandState[result.val.nodeId],
           meta: result.val.meta
         }
       : {
@@ -93,3 +99,27 @@ export const makeListFromFileTree = <TMeta, TAgg, TDescendentInfo>(
           meta: result.val.meta
         })
   }));
+
+export const filterFileTree = <TMeta, TAgg, TDescendentInfo>(
+  items: ListItem<TMeta, TAgg, TDescendentInfo>[],
+  state: Record<number, ItemState | undefined>
+): ListItem<TMeta, TAgg, TDescendentInfo>[] => {
+  const filteredItems: ListItem<TMeta, TAgg, TDescendentInfo>[] = [];
+  const itemStack: ListItem[] = [];
+  for (const item of items) {
+    while (item.level + 1 < itemStack.length) {
+      itemStack.pop();
+    }
+    if (item.level + 1 > itemStack.length) {
+      itemStack.push(item);
+    } else {
+      itemStack[itemStack.length - 1] = item;
+    }
+
+    if (itemStack.slice(0, itemStack.length - 1).find(node => node.isDirectory && !state[node.nodeId]?.expanded)) {
+      continue;
+    }
+    filteredItems.push(item);
+  }
+  return filteredItems;
+};
