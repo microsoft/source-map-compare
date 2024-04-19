@@ -10,8 +10,9 @@
       // "args": ["compare", "./.local/baseline/**/*.js", "./.local/compare/**/*.js"],
       "args": [
         "compare",
-        "./.local/input/baseline/loop-app-release-bundle/hashed/card-loop-adaptivecardview.fa16901d12b9fcad5c44.js",
-        "./.local/input/compare/loop-app-release-bundle/hashed/card-loop-adaptivecardview.14c550538fbf4ab951f9.js"
+        "./.local/input/baseline/loop-app-release-bundle/**/*.js",
+        "./.local/input/compare/loop-app-release-bundle/**/*.js",
+        "--verbose"
       ],
       "runtimeArgs": ["--openssl-legacy-provider"],
       "console": "integratedTerminal",

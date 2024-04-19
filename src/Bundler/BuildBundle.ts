@@ -8,9 +8,9 @@ import { rimraf } from 'rimraf';
 import { promisify } from 'util';
 import webpack from 'webpack';
 import type { AppArguments } from '../AppArguments';
+import type { CommonOptions } from './Options';
 import { externalLibs } from './Externals';
 import { InlineChunkHtmlPlugin } from './InlineChunkHtmlPlugin';
-import type { CommonOptions } from './Options';
 
 export async function buildBundle(appArgs: AppArguments, options: CommonOptions, log: Logger): Promise<void> {
   const tempOutputDirectory = path.resolve(

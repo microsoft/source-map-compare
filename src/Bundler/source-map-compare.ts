@@ -1,17 +1,15 @@
 #!/usr/bin/env node
 import { program, type Action, type Logger, type ActionParameters } from '@caporal/core';
-import { readFile as readFileAsync } from 'fs';
+import { existsSync } from 'fs';
+import { readFile } from 'fs/promises';
+import { glob } from 'glob';
 import * as path from 'path';
 import { explore } from 'source-map-explorer';
 import type { ExploreResult, Bundle } from 'source-map-explorer/lib/types';
-import { promisify } from 'util';
 import type { AppArguments, BundleStats } from '../AppArguments';
-import { buildBundle } from './BuildBundle';
 import { type CommonOptions, OUTPUT_FLAVORS } from './Options';
-import { glob } from 'glob';
-import fs from 'fs';
-
-const readFile = promisify(readFileAsync);
+import { buildBundle } from './BuildBundle';
+import { truncate } from '../Helpers';
 
 interface CompareArgs {
   left: string;
@@ -33,47 +31,29 @@ function isSMEExploreResultError(value: unknown): value is ExploreResult {
 async function getStats(log: Logger, mainPath: string, sourcemapPath?: string): Promise<ExploreResult> {
   if (path.extname(mainPath) === '.json') {
     // Already processed stats file
-    log.info(`Reading stats file from ${mainPath}`);
+    log.info(truncate`Reading stats file from ${truncate.tail(mainPath)}`);
     const stats = JSON.parse((await readFile(mainPath)).toString()) as BundleStats;
     return { bundles: stats.results, errors: [] };
   }
 
-  log.info(`Parsing bundle at ${mainPath}`);
+  log.info(truncate`Parsing bundle at ${truncate.tail(mainPath)}`);
 
   let result: ExploreResult;
 
   const bundles: Bundle[] = [];
   // if file exists, it isn't a glob pattern
-  if (fs.existsSync(mainPath) || sourcemapPath) {
+  if (existsSync(mainPath) || sourcemapPath) {
     bundles.push({ code: mainPath, map: sourcemapPath });
+    log.verbose(truncate`Loaded:  ${truncate.tail(mainPath)}`);
   } else {
-    // auto-detect sourcemaps
-    bundles.push(
-      ...glob
-        .globSync(mainPath, { absolute: true })
-        .map<Bundle>(code => {
-          let map: string | undefined;
-          const lastLine = fs
-            .readFileSync(code, 'utf8')
-            .split(/(\r\n|\n)/g)
-            .pop();
-          if (lastLine) {
-            const sourceMappingURLMatch = lastLine.match(/^\/\/# sourceMappingURL=(.*)$/);
-            if (sourceMappingURLMatch) {
-              map = path.join(path.dirname(code), sourceMappingURLMatch[1]);
-            }
-          }
-          if (!map) {
-            const sourcemapFile = `${code}.map`;
-            if (fs.existsSync(sourcemapFile)) {
-              map = sourcemapFile;
-            }
-          }
-          return { code, map };
-        })
-        // only include chunks with sourcemaps
-        .filter(bundle => bundle.map !== undefined)
-    );
+    for await (const bundle of scanBundles(mainPath)) {
+      if (bundle.map === undefined) {
+        log.verbose(truncate`Skipped: ${truncate.tail(bundle.code.toString())} (no sourcemap)`);
+        continue;
+      }
+      log.verbose(truncate`Loaded:  ${truncate.tail(bundle.code.toString())}`);
+      bundles.push(bundle);
+    }
   }
 
   try {
@@ -94,6 +74,28 @@ async function getStats(log: Logger, mainPath: string, sourcemapPath?: string): 
   }
 
   return result;
+}
+
+async function* scanBundles(mainPath: string): AsyncGenerator<Bundle> {
+  for await (const code of glob.iterate(mainPath, { absolute: true })) {
+    let map: string | undefined;
+    const fileContents = await readFile(code, 'utf8');
+    const lastLine = fileContents.split(/(\r\n|\n)/g).pop();
+    // auto-detect sourcemaps
+    if (lastLine) {
+      const sourceMappingURLMatch = lastLine.match(/^\/\/# sourceMappingURL=(.*)$/);
+      if (sourceMappingURLMatch) {
+        map = path.join(path.dirname(code), sourceMappingURLMatch[1]);
+      }
+    }
+    if (!map) {
+      const sourcemapFile = `${code}.map`;
+      if (existsSync(sourcemapFile)) {
+        map = sourcemapFile;
+      }
+    }
+    yield { code, map };
+  }
 }
 
 /**
