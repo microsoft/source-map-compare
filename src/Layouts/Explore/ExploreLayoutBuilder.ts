@@ -8,11 +8,11 @@ export interface DescendantSizeInfo {
 }
 
 export class ExploreLayoutBuilder implements LayoutBuilder<FileData, FileData, DescendantSizeInfo> {
-  constructor(private readonly bundleInfo: ExploreBundleResult) {}
+  constructor(private readonly bundles: ExploreBundleResult[]) {}
 
   public makeFileTree() {
     return reduceFileTree<FileData, unknown, FileData>(
-      makeFileTree(this.bundleInfo.files),
+      makeFileTree(Object.assign({}, ...this.bundles.map(bundle => bundle.files))),
       // Reducer to add up cumulative size of sub-tree
       (files, subdirectories): FileData =>
         // eslint-disable-next-line no-restricted-syntax

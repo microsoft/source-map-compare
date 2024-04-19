@@ -5,15 +5,15 @@ import { type ListItem, makeListFromFileTree } from '../../Model';
 import { singleBundleColumns } from './ExploreColumns';
 import type { BundleViewProps } from '../../View/BundleView';
 
-function evaluateExploreModel(bundle: ExploreBundleResult) {
-  const layout = new ExploreLayoutBuilder(bundle);
+function evaluateExploreModel(bundles: ExploreBundleResult[]) {
+  const layout = new ExploreLayoutBuilder(bundles);
   const fileTree = layout.makeFileTree();
   const items = makeListFromFileTree(fileTree, context => layout.computeDescendantInfo(context));
   return { items, columns: singleBundleColumns };
 }
 
 export function useExploreModel(
-  bundle: ExploreBundleResult
+  bundles: ExploreBundleResult[]
 ): BundleViewProps<ListItem<FileData, FileData, DescendantSizeInfo>> {
-  return React.useMemo(() => evaluateExploreModel(bundle), [bundle]);
+  return React.useMemo(() => evaluateExploreModel(bundles), [bundles]);
 }

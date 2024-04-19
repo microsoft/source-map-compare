@@ -2,12 +2,14 @@
 import { program, type Action, type Logger, type ActionParameters } from '@caporal/core';
 import { readFile as readFileAsync } from 'fs';
 import * as path from 'path';
-import type * as SME from 'source-map-explorer/lib/types';
 import { explore } from 'source-map-explorer';
+import type { ExploreResult, Bundle } from 'source-map-explorer/lib/types';
 import { promisify } from 'util';
 import type { AppArguments, BundleStats } from '../AppArguments';
 import { buildBundle } from './BuildBundle';
 import { type CommonOptions, OUTPUT_FLAVORS } from './Options';
+import { glob } from 'glob';
+import fs from 'fs';
 
 const readFile = promisify(readFileAsync);
 
@@ -23,12 +25,12 @@ interface SingleBundleArgs {
   sourcemap?: string;
 }
 
-function isSMEExploreResultError(value: unknown): value is SME.ExploreResult {
-  const exploreResult = value as SME.ExploreResult;
+function isSMEExploreResultError(value: unknown): value is ExploreResult {
+  const exploreResult = value as ExploreResult;
   return exploreResult.errors !== undefined && Array.isArray(exploreResult.errors);
 }
 
-async function getStats(log: Logger, mainPath: string, sourcemapPath?: string): Promise<SME.ExploreResult> {
+async function getStats(log: Logger, mainPath: string, sourcemapPath?: string): Promise<ExploreResult> {
   if (path.extname(mainPath) === '.json') {
     // Already processed stats file
     log.info(`Reading stats file from ${mainPath}`);
@@ -38,11 +40,45 @@ async function getStats(log: Logger, mainPath: string, sourcemapPath?: string): 
 
   log.info(`Parsing bundle at ${mainPath}`);
 
-  let result: SME.ExploreResult;
+  let result: ExploreResult;
+
+  const bundles: Bundle[] = [];
+  // if file exists, it isn't a glob pattern
+  if (fs.existsSync(mainPath) || sourcemapPath) {
+    bundles.push({ code: mainPath, map: sourcemapPath });
+  } else {
+    // auto-detect sourcemaps
+    bundles.push(
+      ...glob
+        .globSync(mainPath, { absolute: true })
+        .map<Bundle>(code => {
+          let map: string | undefined;
+          const lastLine = fs
+            .readFileSync(code, 'utf8')
+            .split(/(\r\n|\n)/g)
+            .pop();
+          if (lastLine) {
+            const sourceMappingURLMatch = lastLine.match(/^\/\/# sourceMappingURL=(.*)$/);
+            if (sourceMappingURLMatch) {
+              map = path.join(path.dirname(code), sourceMappingURLMatch[1]);
+            }
+          }
+          if (!map) {
+            const sourcemapFile = `${code}.map`;
+            if (fs.existsSync(sourcemapFile)) {
+              map = sourcemapFile;
+            }
+          }
+          return { code, map };
+        })
+        // only include chunks with sourcemaps
+        .filter(bundle => bundle.map !== undefined)
+    );
+  }
 
   try {
-    result = await explore({ code: mainPath, map: sourcemapPath }, { output: { format: 'json' } });
-  } catch (err) {
+    result = await explore(bundles, { output: { format: 'json' } });
+  } catch (err: unknown) {
     if (isSMEExploreResultError(err)) {
       // SME throws a ExploreResult object in case of errors
       result = err;
@@ -79,13 +115,13 @@ function actionWrapper<
 const compareBundles: Action = actionWrapper<CompareArgs, CommonOptions>(async ({ logger, args, options }) => {
   logger.debug('args: ', args);
   logger.debug('options: ', options);
-  const leftExploreResult = await getStats(logger, args.left, args.leftSourcemap);
-  const rightExploreResult = await getStats(logger, args.right, args.rightSourcemap);
+  const baseline = await getStats(logger, args.left, args.leftSourcemap);
+  const compare = await getStats(logger, args.right, args.rightSourcemap);
 
   const appArgs: AppArguments = {
     mode: 'comparison',
-    baseline: leftExploreResult.bundles[0],
-    compare: rightExploreResult.bundles[0]
+    baseline: baseline.bundles,
+    compare: compare.bundles
   };
 
   return buildBundle(appArgs, options, logger);
@@ -98,7 +134,7 @@ const analyzeBundle = actionWrapper<SingleBundleArgs, CommonOptions>(async ({ lo
 
   const appArgs: AppArguments = {
     mode: 'single',
-    bundle: exploreResult.bundles[0]
+    bundles: exploreResult.bundles
   };
 
   return buildBundle(appArgs, options, logger);
@@ -125,14 +161,14 @@ if (require.main === module) {
 
   program
     .command('compare', 'Compares two bundles')
-    .argument('<left>', 'Path to either left bundle file or stats json file')
-    .argument('<right>', 'Path to either right bundle file or stats json file')
-    .argument('[left_sourcemap]', 'If <left> argument is a bundle, this optionally points to its source-map')
-    .argument('[right_sourcemap]', 'If <right> argument is a bundle, this optionally points to its source-map')
+    .argument('<left>', 'Path to either left bundle file, glob pattern, or stats json file')
+    .argument('<right>', 'Path to either right bundle file, glob pattern, or stats json file')
+    .argument('[left_sourcemap]', 'If <left> argument is a bundle file, this optionally points to its source-map')
+    .argument('[right_sourcemap]', 'If <right> argument is a bundle file, this optionally points to its source-map')
     .action(compareBundles)
     .command('analyze', 'View a single bundle')
     .argument('<bundle>', 'Path to either bundle file or stats json file')
-    .argument('[sourcemap]', 'If <bundle> argument is a bundle, this optionally points to its source-map')
+    .argument('[sourcemap]', 'If <bundle> argument is a bundle file, this optionally points to its source-map')
     .action(analyzeBundle);
 
   program.run();

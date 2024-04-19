@@ -1,7 +1,7 @@
 import React from 'react';
 import { ChevronDown24Regular, ChevronRight24Regular, Javascript24Regular } from '@fluentui/react-icons';
 import { useStyles } from './CellValue.styles';
-import type { ListItem } from '../Model/FileList';
+import type { ListItem } from '../../Model';
 
 export type ColorFunction = (val: number) => `rgb(${number},${number},${number})` | undefined;
 

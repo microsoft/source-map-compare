@@ -14,7 +14,7 @@ export const App: React.FC<AppProps> = ({ args }) => {
       return <BundleView columns={columns} items={items} />;
     }
     case 'single': {
-      const { columns, items } = useExploreModel(args.bundle);
+      const { columns, items } = useExploreModel(args.bundles);
       return <BundleView columns={columns} items={items} />;
     }
   }

@@ -6,7 +6,7 @@ export interface BundleStats {
 
 export interface SingleBundleAppArgs {
   mode: 'single';
-  bundle: ExploreBundleResult;
+  bundles: ExploreBundleResult[];
 }
 
 export interface BundleComparisonAppArgs {

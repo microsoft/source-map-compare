@@ -23,12 +23,22 @@ export async function buildBundle(appArgs: AppArguments, options: CommonOptions,
   log.info(`Outputting webpack build to ${tempOutputDirectory}`);
 
   const isProduction = (options.outputFlavor ?? 'production') === 'production';
-  const bundleName = appArgs.mode === 'comparison' ? appArgs.compare.bundleName : appArgs.bundle.bundleName;
+  const bundleName =
+    appArgs.mode === 'comparison'
+      ? appArgs.baseline.length === 1
+        ? appArgs.compare[0].bundleName
+        : '(Comparison)'
+      : appArgs.bundles.length === 1
+        ? appArgs.bundles[0].bundleName
+        : '(Explore)';
 
   const config: webpack.Configuration = {
     mode: isProduction ? 'production' : 'development',
     resolve: {
-      extensions: ['.tsx', '.ts', '.js']
+      extensions: ['.tsx', '.ts', '.js'],
+      fallback: {
+        path: require.resolve('path-browserify')
+      }
     },
     output: { path: tempOutputDirectory, filename: '[name].js', chunkFilename: '[name].js' },
     context: path.resolve(__dirname, '../../'),
