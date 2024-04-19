@@ -48,15 +48,31 @@ describe('parseBundlePath', () => {
 
 describe('filterFileTree', () => {
   const items: ListItem[] = [
-    { nodeId: 1, name: 'root', isDirectory: true, meta: {}, descendantInfo: {}, level: 0, parentNodeId: undefined },
-    { nodeId: 2, name: 'b', isDirectory: true, meta: {}, descendantInfo: {}, level: 1, parentNodeId: 1 },
+    {
+      nodeId: 1,
+      name: 'root',
+      isDirectory: true,
+      meta: {},
+      descendantInfo: {},
+      level: 0,
+      parentNodeId: undefined
+    },
+    {
+      nodeId: 2,
+      name: 'b',
+      isDirectory: true,
+      meta: {},
+      descendantInfo: {},
+      level: 1,
+      parentNodeId: 1
+    },
     {
       nodeId: 3,
       name: 'b.c',
       isDirectory: false,
       meta: {},
       descendantInfo: {},
-      level: 1,
+      level: 2,
       parentNodeId: 2,
       filepath: 'b.c'
     },
@@ -66,7 +82,7 @@ describe('filterFileTree', () => {
       isDirectory: true,
       meta: {},
       descendantInfo: {},
-      level: 1,
+      level: 2,
       parentNodeId: 2
     },
     {
@@ -75,9 +91,18 @@ describe('filterFileTree', () => {
       isDirectory: false,
       meta: {},
       descendantInfo: {},
-      level: 2,
+      level: 3,
       parentNodeId: 4,
       filepath: 'b.d.e'
+    },
+    {
+      nodeId: 6,
+      name: 'f',
+      isDirectory: true,
+      meta: {},
+      descendantInfo: {},
+      level: 1,
+      parentNodeId: 1
     }
   ];
   it('Always includes the root', () => {
@@ -86,7 +111,16 @@ describe('filterFileTree', () => {
   it('Nested expansion remains hidden', () => {
     expect(filterFileTree(items, { 4: { expanded: true } })).toEqual([items[0]]);
   });
-  it('Top expansion revealse one depth', () => {
-    expect(filterFileTree(items, { 1: { expanded: true } })).toEqual([items[0], items[1]]);
+  it('Top expansion reveals one depth', () => {
+    expect(filterFileTree(items, { 1: { expanded: true } })).toEqual([items[0], items[1], items[5]]);
+  });
+  it('Chained expansion reveals multiple depth', () => {
+    expect(filterFileTree(items, { 1: { expanded: true }, 2: { expanded: true } })).toEqual([
+      items[0],
+      items[1],
+      items[2],
+      items[3],
+      items[5]
+    ]);
   });
 });
