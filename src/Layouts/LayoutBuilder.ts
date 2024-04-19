@@ -1,5 +1,4 @@
-import type { TreeDescendantContext } from '../FileList';
-import type { FileTree } from '../FileTree';
+import type { TreeDescendantContext, FileTree } from '../Model';
 
 export interface LayoutBuilder<TMeta, TAgg, TDescendentInfo> {
   makeFileTree(): FileTree<TMeta, TAgg>;

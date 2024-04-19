@@ -7,10 +7,10 @@ import {
   DataGridBody,
   DataGridCell
 } from '@fluentui/react-components';
-import type { ComparisonListItem } from '../Model/BundleComparison';
 import { filterFileTree, type ItemState, type ListItem } from '../Model/FileList';
 import { columnsFromColumnInfo, type ColumnInfo } from './ColumnInfo';
 import { useStyles } from './BundleView.styles';
+import { nameColumn } from './NameColumn';
 
 const getListItemRowId = (item: ListItem): string => String(item.nodeId);
 
@@ -25,7 +25,10 @@ export interface BundleViewProps<TItem extends ListItem> {
 
 export function BundleView<TItem extends ListItem>(props: BundleViewProps<TItem>) {
   const styles = useStyles();
-  const [columns, columnSizingOptions] = React.useMemo(() => columnsFromColumnInfo(props.columns), [props.columns]);
+  const [columns, columnSizingOptions] = React.useMemo(
+    () => columnsFromColumnInfo([nameColumn, ...props.columns]),
+    [props.columns]
+  );
   const [itemState, setItemState] = React.useState<Record<number, ItemState | undefined>>({});
   const items = React.useMemo(() => filterFileTree(props.items, itemState), [itemState, props.items]);
   const onRowKeyDown = React.useCallback((nodeId: number, e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -50,9 +53,9 @@ export function BundleView<TItem extends ListItem>(props: BundleViewProps<TItem>
           {({ renderHeaderCell }) => <DataGridHeaderCell>{renderHeaderCell()}</DataGridHeaderCell>}
         </DataGridRow>
       </DataGridHeader>
-      <DataGridBody<ComparisonListItem>>
+      <DataGridBody<ListItem>>
         {({ item, rowId }) => (
-          <DataGridRow<ComparisonListItem>
+          <DataGridRow<ListItem>
             key={rowId}
             onKeyDown={onRowKeyDown.bind(undefined, item.nodeId)}
             selectionCell={{

@@ -72,15 +72,13 @@ const flattenFileTree = <TMeta, TAgg>(fileTree: FileTree<TMeta, TAgg>): SearchRe
 };
 
 export interface TreeDescendantContext<TMeta, TAgg> {
-  curr: FileTreeDirectory<TMeta, TAgg> | FileTreeFile<TMeta>;
+  current: FileTreeDirectory<TMeta, TAgg> | FileTreeFile<TMeta>;
   parent: FileTreeDirectory<TMeta, TAgg> | undefined;
   root: FileTree<TMeta, TAgg>;
 }
 
 export type DescendantInfoPredicate<TMeta, TAgg, TDescendentInfo> = (
-  curr: FileTreeDirectory<TMeta, TAgg> | FileTreeFile<TMeta>,
-  parent: FileTreeDirectory<TMeta, TAgg> | undefined,
-  root: FileTree<TMeta, TAgg>
+  context: TreeDescendantContext<TMeta, TAgg>
 ) => TDescendentInfo;
 
 export const makeListFromFileTree = <TMeta, TAgg, TDescendentInfo>(
@@ -93,7 +91,7 @@ export const makeListFromFileTree = <TMeta, TAgg, TDescendentInfo>(
 
     nodeId: result.val.nodeId,
     parentNodeId: result.parent?.nodeId,
-    descendantInfo: makeDescendantInfo(result.val, result.parent, root),
+    descendantInfo: makeDescendantInfo({ current: result.val, parent: result.parent, root }),
     ...(result.isDirectory
       ? {
           isDirectory: true,

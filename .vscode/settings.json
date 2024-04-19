@@ -16,5 +16,5 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
   },
-  "cSpell.words": ["tseslint"]
+  "cSpell.words": ["fluentui", "subdir", "tseslint"]
 }

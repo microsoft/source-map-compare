@@ -11,8 +11,8 @@ export interface SingleBundleAppArgs {
 
 export interface BundleComparisonAppArgs {
   mode: 'comparison';
-  baseline: ExploreBundleResult;
-  compare: ExploreBundleResult;
+  baseline: ExploreBundleResult[];
+  compare: ExploreBundleResult[];
 }
 
 /**
