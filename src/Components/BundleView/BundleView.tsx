@@ -36,6 +36,9 @@ export function BundleView<TItem extends ListItem>(props: BundleViewProps<TItem>
       setItemState(state => ({ ...state, [nodeId]: { expanded: !state[nodeId]?.expanded } }));
     }
   }, []);
+  const onDoubleClick = React.useCallback((nodeId: number, _e: React.MouseEvent<HTMLDivElement>) => {
+    setItemState(state => ({ ...state, [nodeId]: { expanded: !state[nodeId]?.expanded } }));
+  }, []);
 
   return (
     <DataGrid
@@ -46,10 +49,7 @@ export function BundleView<TItem extends ListItem>(props: BundleViewProps<TItem>
       resizableColumnsOptions={resizableColumnsOptions}
       getRowId={getListItemRowId}>
       <DataGridHeader>
-        <DataGridRow
-          selectionCell={{
-            checkboxIndicator: { 'aria-label': 'Select all rows' }
-          }}>
+        <DataGridRow>
           {({ renderHeaderCell }) => <DataGridHeaderCell>{renderHeaderCell()}</DataGridHeaderCell>}
         </DataGridRow>
       </DataGridHeader>
@@ -58,9 +58,7 @@ export function BundleView<TItem extends ListItem>(props: BundleViewProps<TItem>
           <DataGridRow<ListItem>
             key={rowId}
             onKeyDown={onRowKeyDown.bind(undefined, item.nodeId)}
-            selectionCell={{
-              checkboxIndicator: { 'aria-label': 'Select row' }
-            }}>
+            onDoubleClick={onDoubleClick.bind(undefined, item.nodeId)}>
             {({ renderCell }) => (
               <DataGridCell className={itemState[item.nodeId]?.expanded ? styles.expanded : styles.collapsed}>
                 {renderCell(item)}

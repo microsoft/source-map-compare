@@ -17,22 +17,30 @@ export function ByteFormat(value: number): Intl.NumberFormatOptions {
   return ByteFormattingRules[ByteFormattingRules.length - 1][1];
 }
 
-export function colorFraction(val: number): `rgb(${number},${number},${number})` {
-  let rgb: [number, number, number];
+type RGB = `${number},${number},${number}`;
+
+export type CssColor = `rgb(${RGB})` | `rgba(${RGB},${number})`;
+
+export function colorFraction(val: number): CssColor | undefined {
+  let rgb: RGB | undefined;
+  let a: number | undefined;
 
   if (val >= 0) {
     // Red shade
-    const colorVal = Math.min(Math.round((1 - val) * 155) + 100, 255);
-    rgb = [255, colorVal, colorVal];
+    a = val * 0.5;
+    rgb = '255,0,0';
   } else {
     // Green shade
-    const colorVal = Math.min(Math.round((val + 1) * 155) + 100, 255);
-    rgb = [colorVal, 255, colorVal];
+    a = -val * 0.5;
+    rgb = '0,255,0';
   }
-  return `rgb(${rgb.join(',')})` as `rgb(${number},${number},${number})`;
+  if (rgb === undefined || a === undefined) {
+    return undefined;
+  }
+  return `rgba(${rgb},${Math.min(1, a).toFixed(2) as `${number}`})`;
 }
 
-export function colorDirection(value: number): `rgb(${number},${number},${number})` | undefined {
+export function colorDirection(value: number): CssColor | undefined {
   if (value > 0) {
     return 'rgb(255, 0, 0)';
   } else if (value < 0) {

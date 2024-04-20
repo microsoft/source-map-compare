@@ -37,6 +37,7 @@ export async function buildBundle(appArgs: AppArguments, options: CommonOptions,
     resolve: {
       extensions: ['.tsx', '.ts', '.js'],
       fallback: {
+        inspector: require.resolve('./inspector-browser.js'),
         path: require.resolve('path-browserify')
       }
     },

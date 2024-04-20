@@ -1,7 +1,8 @@
 import React from 'react';
 import { useStyles } from './CellValue.styles';
+import type { CssColor } from './CellFormats';
 
-export type ColorFunction = (val: number) => `rgb(${number},${number},${number})` | undefined;
+export type ColorFunction = (val: number) => CssColor | undefined;
 
 export type NumberFormatProp =
   | Intl.NumberFormatOptions
