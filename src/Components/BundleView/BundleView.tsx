@@ -47,7 +47,8 @@ export function BundleView<TItem extends ListItem>(props: BundleViewProps<TItem>
       columns={columns}
       columnSizingOptions={columnSizingOptions}
       resizableColumnsOptions={resizableColumnsOptions}
-      getRowId={getListItemRowId}>
+      getRowId={getListItemRowId}
+    >
       <DataGridHeader>
         <DataGridRow>
           {({ renderHeaderCell }) => <DataGridHeaderCell>{renderHeaderCell()}</DataGridHeaderCell>}
@@ -58,7 +59,8 @@ export function BundleView<TItem extends ListItem>(props: BundleViewProps<TItem>
           <DataGridRow<ListItem>
             key={rowId}
             onKeyDown={onRowKeyDown.bind(undefined, item.nodeId)}
-            onDoubleClick={onDoubleClick.bind(undefined, item.nodeId)}>
+            onDoubleClick={onDoubleClick.bind(undefined, item.nodeId)}
+          >
             {({ renderCell }) => (
               <DataGridCell className={itemState[item.nodeId]?.expanded ? styles.expanded : styles.collapsed}>
                 {renderCell(item)}
