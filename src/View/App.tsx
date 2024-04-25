@@ -1,5 +1,5 @@
 import React from 'react';
-import type { AppArguments, BundleComparisonAppArgs } from '../AppArguments';
+import type { AppArguments, BundleComparisonAppArgs, SingleBundleAppArgs } from '../AppArguments';
 import { useCompareModel, useExploreModel } from '../Layouts';
 import { BundleView } from '../Components';
 
@@ -7,7 +7,7 @@ export interface AppProps {
   args: AppArguments;
 }
 
-function BrowseBundle(args: AppArguments) {
+function BrowseBundle(args: SingleBundleAppArgs) {
   const { columns, items } = useExploreModel(args.bundles);
   return <BundleView columns={columns} items={items} />;
 }

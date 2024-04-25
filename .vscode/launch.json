@@ -7,6 +7,7 @@
     {
       "name": "Launch Program",
       "program": "${workspaceFolder}/lib/Bundler/source-map-compare",
+      // copy your test bundles to .local/baseline and .local/compare to launch in the debugger
        "args": ["compare", "./.local/baseline/**/*.js", "./.local/compare/**/*.js"],
       "runtimeArgs": ["--openssl-legacy-provider"],
       "console": "integratedTerminal",

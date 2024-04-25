@@ -1,6 +1,6 @@
 {
   "type": "major",
-  "comment": "Update to latest dependencies and FluentUI v9, major refactor",
+  "comment": "Add glob support, update to latest dependencies, major refactor",
   "packageName": "source-map-compare",
   "email": "danieln@microsoft.com",
   "dependentChangeType": "patch"
