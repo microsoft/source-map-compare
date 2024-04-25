@@ -1,9 +1,15 @@
 #!/usr/bin/env node
-import { program, type Action, type ActionParameters } from '@caporal/core';
-import type { AppArguments } from '../AppArguments';
+import { program, type Action, type Logger, type ActionParameters } from '@caporal/core';
+import { existsSync } from 'fs';
+import { readFile } from 'fs/promises';
+import { glob } from 'glob';
+import * as path from 'path';
+import { explore } from 'source-map-explorer';
+import type { ExploreResult, Bundle } from 'source-map-explorer/lib/types';
+import type { AppArguments, BundleStats } from '../AppArguments';
 import { type CommonOptions, OUTPUT_FLAVORS } from './Options';
 import { buildBundle } from './BuildBundle';
-import { getStats } from './getStats';
+import { truncate } from '../Helpers';
 
 interface CompareArgs {
   left: string;
@@ -15,6 +21,81 @@ interface CompareArgs {
 interface SingleBundleArgs {
   bundle: string;
   sourcemap?: string;
+}
+
+function isSMEExploreResultError(value: unknown): value is ExploreResult {
+  const exploreResult = value as ExploreResult;
+  return exploreResult.errors !== undefined && Array.isArray(exploreResult.errors);
+}
+
+async function getStats(log: Logger, mainPath: string, sourcemapPath?: string): Promise<ExploreResult> {
+  if (path.extname(mainPath) === '.json') {
+    // Already processed stats file
+    log.info(truncate`Reading stats file from ${truncate.tail(mainPath)}`);
+    const stats = JSON.parse((await readFile(mainPath)).toString()) as BundleStats;
+    return { bundles: stats.results, errors: [] };
+  }
+
+  log.info(truncate`Parsing bundle at ${truncate.tail(mainPath)}`);
+
+  let result: ExploreResult;
+
+  const bundles: Bundle[] = [];
+  // if file exists, it isn't a glob pattern
+  if (existsSync(mainPath) || sourcemapPath) {
+    bundles.push({ code: mainPath, map: sourcemapPath });
+    log.verbose(truncate`Loaded:  ${truncate.tail(mainPath)}`);
+  } else {
+    for await (const bundle of scanBundles(mainPath)) {
+      if (bundle.map === undefined) {
+        log.verbose(truncate`Skipped: ${truncate.tail(bundle.code.toString())} (no sourcemap)`);
+        continue;
+      }
+      log.verbose(truncate`Loaded:  ${truncate.tail(bundle.code.toString())}`);
+      bundles.push(bundle);
+    }
+  }
+
+  try {
+    result = await explore(bundles, { output: { format: 'json' } });
+  } catch (err: unknown) {
+    if (isSMEExploreResultError(err)) {
+      // SME throws a ExploreResult object in case of errors
+      result = err;
+    } else {
+      throw err;
+    }
+  }
+
+  const errors = result.errors.filter(error => !error.isWarning);
+
+  if (errors.length) {
+    throw new Error(`Encountered errors exploring bundle: ${JSON.stringify(errors)}`);
+  }
+
+  return result;
+}
+
+async function* scanBundles(mainPath: string): AsyncGenerator<Bundle> {
+  for await (const code of glob.iterate(mainPath, { absolute: true })) {
+    let map: string | undefined;
+    const fileContents = await readFile(code, 'utf8');
+    const lastLine = fileContents.split(/(\r\n|\n)/g).pop();
+    // auto-detect sourcemaps
+    if (lastLine) {
+      const sourceMappingURLMatch = lastLine.match(/^\/\/# sourceMappingURL=(.*)$/);
+      if (sourceMappingURLMatch) {
+        map = path.join(path.dirname(code), sourceMappingURLMatch[1]);
+      }
+    }
+    if (!map) {
+      const sourcemapFile = `${code}.map`;
+      if (existsSync(sourcemapFile)) {
+        map = sourcemapFile;
+      }
+    }
+    yield { code, map };
+  }
 }
 
 /**

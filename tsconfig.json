@@ -17,11 +17,11 @@
     "noErrorTruncation": true,
     "esModuleInterop": true,
     "outDir": "lib",
-    "target": "ESNext",
+    "target": "es2018",
     "module": "commonjs",
     "lib": ["dom", "ESNext"],
     "sourceMap": true
   },
-  "include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.tsx", "src/FileSystem/WebFS/FileSystem.polyfills.ts"],
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
   "exclude": ["node_modules", "dist", "lib"]
 }
