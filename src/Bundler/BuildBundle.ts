@@ -1,7 +1,6 @@
 import type { Logger } from '@caporal/core';
 import { execSync } from 'child_process';
 import { promises as fsPromises, mkdirSync } from 'fs';
-import { default as HtmlWebpackPlugin } from 'html-webpack-plugin';
 import * as os from 'os';
 import * as path from 'path';
 import { rimraf } from 'rimraf';
@@ -11,6 +10,8 @@ import type { AppArguments } from '../AppArguments';
 import type { CommonOptions } from './Options';
 import { externalLibs } from './Externals';
 import { InlineChunkHtmlPlugin } from './InlineChunkHtmlPlugin';
+import merge from 'webpack-merge';
+import baseConfig from './webpack.config';
 
 export async function buildBundle(appArgs: AppArguments, options: CommonOptions, log: Logger): Promise<void> {
   const tempOutputDirectory = path.resolve(
@@ -32,35 +33,15 @@ export async function buildBundle(appArgs: AppArguments, options: CommonOptions,
         ? appArgs.bundles[0].bundleName
         : '(Explore)';
 
-  const config: webpack.Configuration = {
+  const config: webpack.Configuration = merge(baseConfig({ bundleName, appArgs }), {
     mode: isProduction ? 'production' : 'development',
-    resolve: {
-      extensions: ['.tsx', '.ts', '.js'],
-      fallback: {
-        inspector: require.resolve('./inspector-browser.js'),
-        path: require.resolve('path-browserify')
-      }
-    },
     output: { path: tempOutputDirectory, filename: '[name].js', chunkFilename: '[name].js' },
-    context: path.resolve(__dirname, '../../'),
-    entry: ['./lib/View/index.js'],
     externals: options.noCdn
       ? undefined
       : Object.fromEntries(
           externalLibs.map(({ packageName, libraryVariable }) => [packageName, libraryVariable] as const)
         ),
     plugins: [
-      // Use banner plugin to inject app_arguments
-      new webpack.BannerPlugin({
-        raw: true,
-        entryOnly: true,
-        banner: `window.APP_ARGUMENTS = ${JSON.stringify(appArgs)};`,
-        test: /\.[tj]sx?$/
-      }),
-      new HtmlWebpackPlugin({
-        title: `Bundle Size Viewer - ${bundleName}`,
-        inject: 'body'
-      }),
       new InlineChunkHtmlPlugin({
         tests: [
           // Inline all chunks
@@ -73,9 +54,8 @@ export async function buildBundle(appArgs: AppArguments, options: CommonOptions,
                 `https://unpkg.com/${packageName}@${packageSemver}${scriptPath}`
             )
       })
-    ],
-    devtool: 'source-map'
-  };
+    ]
+  });
 
   log.debug('webpack config: ', config);
   const compiler = webpack(config);

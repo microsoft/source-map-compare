@@ -19,7 +19,7 @@
   "settings": {
     "react": { "version": 18 },
     "import/parsers": {
-      "@typescript-eslint/parser": [".ts", ".tsx"]
+      "@typescript-eslint/parser": [".d.ts", ".ts", ".tsx"]
     }
   },
   "rules": {
@@ -50,5 +50,16 @@
         ]
       }
     ]
-  }
+  },
+  "overrides": [
+    {
+      "files": ["./*.ts", "./*.d.ts"],
+      "parser": "@typescript-eslint/parser",
+      "parserOptions": {
+        "ecmaVersion": 2018,
+        "sourceType": "module",
+        "project": false
+      }
+    }
+  ]
 }
