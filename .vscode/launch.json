@@ -7,13 +7,7 @@
     {
       "name": "Launch Program",
       "program": "${workspaceFolder}/lib/Bundler/source-map-compare",
-      // "args": ["compare", "./.local/baseline/**/*.js", "./.local/compare/**/*.js"],
-      "args": [
-        "compare",
-        "./.local/input/baseline/loop-app-release-bundle/**/*.js",
-        "./.local/input/compare/loop-app-release-bundle/**/*.js",
-        "--verbose"
-      ],
+       "args": ["compare", "./.local/baseline/**/*.js", "./.local/compare/**/*.js"],
       "runtimeArgs": ["--openssl-legacy-provider"],
       "console": "integratedTerminal",
       "request": "launch",
