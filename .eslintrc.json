@@ -15,7 +15,7 @@
     "sourceType": "module",
     "project": "./tsconfig.json"
   },
-  "plugins": ["jest", "@typescript-eslint", "jsx-a11y", "import"],
+  "plugins": ["jest", "@typescript-eslint", "jsx-a11y", "import", "react-hooks"],
   "settings": {
     "react": { "version": 18 },
     "import/parsers": {
@@ -23,6 +23,8 @@
     }
   },
   "rules": {
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "error",
     "@typescript-eslint/consistent-type-imports": ["error", { "disallowTypeAnnotations": false }],
     "@typescript-eslint/no-parameter-properties": "off",
     "@typescript-eslint/no-unused-vars": "off",
