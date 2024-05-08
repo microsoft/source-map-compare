@@ -5,6 +5,32 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Launch Program",
+      "program": "${workspaceFolder}/lib/Bundler/source-map-compare",
+      // copy your test bundles to .local/baseline and .local/compare to launch in the debugger
+       "args": ["compare", "./.local/baseline/**/*.js", "./.local/compare/**/*.js"],
+      "runtimeArgs": ["--openssl-legacy-provider"],
+      "console": "integratedTerminal",
+      "request": "launch",
+      "preLaunchTask": "npm: build",
+      "skipFiles": ["<node_internals>/**"],
+      "type": "node"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Test current file",
+      "program": "${workspaceFolder}/node_modules/jest-cli/bin/jest",
+      "args": [
+        "${fileBasename}",
+        "--verbose",
+        "-i",
+        "--no-cache"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    }
+    {
       "type": "node",
       "request": "attach",
       "name": "Attach",

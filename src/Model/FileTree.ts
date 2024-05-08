@@ -1,9 +1,16 @@
+export interface FileTreeNode {
+  nodeId: number;
+  name: string;
+}
+
 /**
  * Representation of a file in the file tree
  *
  * @param TMeta Stores metadata about the file
  */
-export type FileTreeFile<TMeta> = { nodeId: number; name: string; meta: TMeta };
+export interface FileTreeFile<TMeta> extends FileTreeNode {
+  meta: TMeta;
+}
 
 /**
  * Representation of a directory (node) in the file tree
@@ -11,16 +18,15 @@ export type FileTreeFile<TMeta> = { nodeId: number; name: string; meta: TMeta };
  * @param TMeta Stores metadata about the file
  * @param TAgg Stores some aggregate data about all descendent files in the directory. This is a top-down reduction
  */
-export type FileTreeDirectory<TMeta, TAgg> = {
-  nodeId: number;
-  name: string;
+export interface FileTreeDirectory<TMeta, TAgg> extends FileTreeNode {
   meta: TAgg;
   files: Record<string, FileTreeFile<TMeta> | undefined>;
   subdirectories: Record<string, FileTreeDirectory<TMeta, TAgg> | undefined>;
-};
+}
+
 export type FileTree<TMeta, TAgg> = FileTreeDirectory<TMeta, TAgg>;
 
-export type BundlePathInfo = {
+export interface BundlePathInfo {
   /**
    * All ancestors of a path, in top-down order
    */
@@ -33,7 +39,7 @@ export type BundlePathInfo = {
    * Whether this node is metadata as opposed to a regular file
    */
   isSpecial: boolean;
-};
+}
 
 export function parseBundlePath(path: string): BundlePathInfo {
   const normalizedPath = path.replace('webpack://', '');

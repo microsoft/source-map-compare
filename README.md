@@ -8,25 +8,51 @@ This tool is built off of and heavily inspired by [source-map-explorer](https://
 
 To install globally:
 
-```
+```sh
 npm i -g source-map-compare
 ```
 
-source-map-compare can also be run via npx.
+`source-map-compare` can also be run via `npx`.
 
 ## Basic usage
 
-To compare two bundles:
+To compare two bundles, you can provide either exact paths or user glob patterns to select the baseline and comparison bundles. If multiple bundles match a glob, they will be aggregated into a aggregate single view.
+
+If your sourcemaps are not in the same directory as the bundle, you can provide the exact paths to them. Note that this only works for single file comparisons. Glob patterns only support automatic detection of sourcemaps via `sourceMapUrl` or side-by-side sourcemaps in the same directory.
 
 ```sh
-source-map-compare compare <left> <right> [left_sourcemap] [right_sourcemap]
+# source-map-compare compare <left> <right> [left_sourcemap] [right_sourcemap]
+
+# multi-chunk bundle comparison:
+source-map-compare compare dist/**/*.js releases/221/**/*.js
+# single file bundle comparison:L
+source-map-compare compare dist/app.js releases/221/app.js
+# single file bundle comparison with manual sourcemaps path:
+source-map-compare compare dist/app.js releases/221/app.js .symbols/app.js.map .symbols/221/app.js.map
 ```
 
 To analyze a single bundle:
 
 ```sh
-source-map-compare analyze <bundle> [sourcemap]
+# source-map-compare analyze <bundle> [sourcemap]
+
+# analyze multiple chunks in a bundle (aggregated):
+source-map-compare analyze dist/**/*.js 
+# analyze a single file bundle:
+source-map-compare analyze dist/app.js 
+# analyze string file bundle with manual sourcemaps path:
+source-map-compare analyze dist/app.js dist/app.js.map
 ```
+
+## Sourcemap resolution
+
+If a JS file has a `sourceMappingUrl` comment at the end of the file, it will attempt to be used relative to the directory containing the JS file:
+
+```js
+//# sourceMappingURL=TestComponent.da60eb2d9009485e9733.js.map
+```
+
+If a `sourceMappingURL` is not present or the file does not exist, it will attempt to find a sourcemap in the same directory with the same name as the JS file with a `.js.map` extension.
 
 ## Definitions of metrics
 
@@ -44,7 +70,7 @@ Formal definitions can be found in [./src/view/Columns.tsx]
 
 This project welcomes contributions and suggestions. Most contributions require you to agree to a
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
-the rights to use your contribution. For details, visit https://cla.opensource.microsoft.com.
+the rights to use your contribution. For details, visit <https://cla.opensource.microsoft.com>.
 
 When you submit a pull request, a CLA bot will automatically determine whether you need to provide
 a CLA and decorate the PR appropriately (e.g., status check, comment). Simply follow the instructions
@@ -58,7 +84,7 @@ contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additio
 
 After cloning the repo, you can install and build with:
 
-```
+```sh
 yarn
 yarn build
 ```
@@ -67,7 +93,7 @@ You may need to first install yarn with `npm install -g yarn`.
 
 This repo uses [Beachball](https://microsoft.github.io/beachball) for tracking package versions. Before you can complete a pull request, you must generate change files for your change by running:
 
-```
+```sh
 yarn change
 ```
 

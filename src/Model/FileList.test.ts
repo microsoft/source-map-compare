@@ -1,4 +1,6 @@
-import { BundlePathInfo, parseBundlePath } from './FileTree';
+import type { ListItem } from './FileList';
+import { filterFileTree } from './FileList';
+import { type BundlePathInfo, parseBundlePath } from './FileTree';
 
 describe('parseBundlePath', () => {
   it('Parses absolute windows paths correctly', () =>
@@ -42,4 +44,83 @@ describe('parseBundlePath', () => {
       isSpecial: true,
       path: []
     } as BundlePathInfo));
+});
+
+describe('filterFileTree', () => {
+  const items: ListItem[] = [
+    {
+      nodeId: 1,
+      name: 'root',
+      isDirectory: true,
+      meta: {},
+      descendantInfo: {},
+      level: 0,
+      parentNodeId: undefined
+    },
+    {
+      nodeId: 2,
+      name: 'b',
+      isDirectory: true,
+      meta: {},
+      descendantInfo: {},
+      level: 1,
+      parentNodeId: 1
+    },
+    {
+      nodeId: 3,
+      name: 'b.c',
+      isDirectory: false,
+      meta: {},
+      descendantInfo: {},
+      level: 2,
+      parentNodeId: 2,
+      filepath: 'b.c'
+    },
+    {
+      nodeId: 4,
+      name: 'b.d',
+      isDirectory: true,
+      meta: {},
+      descendantInfo: {},
+      level: 2,
+      parentNodeId: 2
+    },
+    {
+      nodeId: 5,
+      name: 'b.d.e',
+      isDirectory: false,
+      meta: {},
+      descendantInfo: {},
+      level: 3,
+      parentNodeId: 4,
+      filepath: 'b.d.e'
+    },
+    {
+      nodeId: 6,
+      name: 'f',
+      isDirectory: true,
+      meta: {},
+      descendantInfo: {},
+      level: 1,
+      parentNodeId: 1
+    }
+  ];
+  it('Always includes the root', () => {
+    expect(filterFileTree(items, {})).toEqual([items[0]]);
+  });
+  it('Nested expansion remains hidden', () => {
+    expect(filterFileTree(items, { 4: { expanded: true } })).toEqual([items[0]]);
+  });
+  it('Top expansion reveals one depth', () => {
+    expect(filterFileTree(items, { 1: { expanded: true } })).toEqual([items[0], items[1], items[5]]);
+  });
+  it('Chained expansion reveals multiple depth', () => {
+    expect(filterFileTree(items, { 1: { expanded: true }, 2: { expanded: true } })).toEqual([
+      items[0],
+      items[1],
+      items[2],
+      items[3],
+      items[5]
+    ]);
+  });
 });

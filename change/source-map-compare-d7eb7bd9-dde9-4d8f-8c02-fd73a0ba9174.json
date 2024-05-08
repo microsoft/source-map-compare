@@ -1,0 +1,7 @@
+{
+  "type": "major",
+  "comment": "Add glob support, update to latest dependencies, major refactor",
+  "packageName": "source-map-compare",
+  "email": "danieln@microsoft.com",
+  "dependentChangeType": "patch"
+}

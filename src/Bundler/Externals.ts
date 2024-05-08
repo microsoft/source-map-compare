@@ -9,20 +9,14 @@ export interface ExternalLib {
 export const externalLibs: ExternalLib[] = [
   {
     packageName: 'react',
-    packageSemver: '^17.0.1',
+    packageSemver: '^18.2.0',
     libraryVariable: 'React',
     scriptPath: '/umd/react.production.min.js'
   },
   {
     packageName: 'react-dom',
-    packageSemver: '^17.0.1',
+    packageSemver: '^18.2.0',
     libraryVariable: 'ReactDOM',
     scriptPath: '/umd/react-dom.production.min.js'
-  },
-  {
-    packageName: '@fluentui/react',
-    packageSemver: '^8.32.0',
-    libraryVariable: 'FluentUIReact',
-    scriptPath: '/dist/fluentui-react.min.js'
   }
 ];
